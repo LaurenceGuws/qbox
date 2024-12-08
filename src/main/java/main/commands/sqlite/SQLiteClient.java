@@ -12,19 +12,26 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.concurrent.Callable;
 
-@Command(name = "sqlite", mixinStandardHelpOptions = true, description = "SQLite client to manage and query databases.", subcommands = {
+@Command(
+    name = "sqlite",
+    mixinStandardHelpOptions = true,
+    description = "SQLite client to manage and query databases.",
+    subcommands = {
         SQLiteClient.CreateDbCommand.class,
-        SQLiteClient.QueryCommand.class
-})
+        SQLiteClient.QueryCommand.class,
+        SQLiteClient.ExamplesCommand.class
+    }
+)
 public class SQLiteClient implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("SQLite client. Use --help to view available commands.");
+        System.out.println("SQLite client. Use one of the subcommands: create-db, query, or examples.");
     }
 
     @Command(name = "create-db", description = "Creates a SQLite database from a .sql schema file.")
     static class CreateDbCommand implements Callable<Integer> {
+
         @Parameters(index = "0", description = "The path to the .sql schema file.")
         private String schemaFile;
 
@@ -57,6 +64,7 @@ public class SQLiteClient implements Runnable {
 
     @Command(name = "query", description = "Executes a SQL query on the specified SQLite database.")
     static class QueryCommand implements Callable<Integer> {
+
         @Option(names = { "-d", "--db" }, description = "Path to the SQLite database file.", required = true)
         private String dbFile;
 
@@ -75,7 +83,7 @@ public class SQLiteClient implements Runnable {
             }
 
             try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + dbFile);
-                    Statement stmt = conn.createStatement()) {
+                 Statement stmt = conn.createStatement()) {
 
                 boolean isResultSet = stmt.execute(query);
 
@@ -113,4 +121,30 @@ public class SQLiteClient implements Runnable {
         }
     }
 
+    @Command(name = "examples", description = "Show usage examples for the SQLite client.")
+    static class ExamplesCommand implements Runnable {
+
+        @Override
+        public void run() {
+            System.out.println("\n=== SQLite Client Usage Examples ===\n");
+
+            // Create database examples
+            System.out.println("1. Create a SQLite database from a schema file:");
+            System.out.println("   $ qbox sqlite create-db schema.sql -o database.db");
+            System.out.println();
+
+            // Query examples
+            System.out.println("2. Execute a SELECT query on a database:");
+            System.out.println("   $ qbox sqlite query -d database.db -q \"SELECT * FROM users;\"");
+            System.out.println();
+
+            System.out.println("3. Execute an UPDATE query on a database:");
+            System.out.println("   $ qbox sqlite query -d database.db -q \"UPDATE users SET active = 1 WHERE id = 5;\"");
+            System.out.println();
+
+            System.out.println("4. Use clean output mode for SELECT queries:");
+            System.out.println("   $ qbox sqlite query -d database.db -q \"SELECT name FROM users;\" -c");
+            System.out.println();
+        }
+    }
 }

@@ -99,6 +99,7 @@
     </dependencies>
     
     <build>
+	<finalName>qbox</finalName>
         <plugins>
             <plugin>
                 <groupId>${quarkus.platform.group-id}</groupId>

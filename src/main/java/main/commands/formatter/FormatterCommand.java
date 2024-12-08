@@ -6,80 +6,99 @@ import picocli.CommandLine.Option;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.Callable;
-// import java.util.logging.Logger;
 
 @Command(
-    name = "formatter",
+    name = "format",
     mixinStandardHelpOptions = true,
     description = "Format and transform raw text data between various formats.",
     subcommands = {
-        FormatterCommand.FormatCommand.class
+        FormatterCommand.ExamplesCommand.class
     }
 )
-public class FormatterCommand implements Runnable {
+public class FormatterCommand implements Callable<Integer> {
 
-    // private static final Logger LOG = Logger.getLogger(FormatterCommand.class.getName());
+    @Option(names = {"-i", "--input"}, description = "Input file or raw data string.", required = true)
+    private String input;
+
+    @Option(names = {"-o", "--output"}, description = "Output file or 'stdout' for console output.", required = true)
+    private String output;
+
+    @Option(names = {"-if", "--input-format"}, description = "Input format: JSON, YAML, XML, CSV, PLAIN_TEXT.", required = true)
+    private Formatter.FormatType inputFormat;
+
+    @Option(names = {"-of", "--output-format"}, description = "Output format: JSON, YAML, XML, CSV, PLAIN_TEXT, TABLE.", required = true)
+    private Formatter.FormatType outputFormat;
+
+    @Option(names = {"--file"}, description = "Treat input and output as files.")
+    private boolean isFile = false;
+
+    @Option(names = {"-c", "--clean"}, description = "Output only the transformed value without additional text.")
+    private boolean cleanOutput;
 
     @Override
-    public void run() {
-        System.out.println("Formatter client. Use --help to view available commands.");
+    public Integer call() {
+        try {
+            String rawData;
+
+            // Handle input
+            if (isFile) {
+                Path inputPath = Path.of(input);
+                if (!Files.exists(inputPath)) {
+                    throw new IllegalArgumentException(String.format("Input file not found at path: %s", input));
+                }
+                rawData = Files.readString(inputPath);
+            } else {
+                rawData = input;
+            }
+
+            // Parse input data
+            String normalizedData = Formatter.normalize(rawData, inputFormat);
+
+            // Transform output data
+            String formattedOutput = Formatter.transform(normalizedData, outputFormat);
+
+            // Handle output
+            if (isFile && !output.equalsIgnoreCase("stdout")) {
+                Path outputPath = Path.of(output);
+                Files.writeString(outputPath, formattedOutput);
+                if (!cleanOutput) {
+                    System.out.printf("Formatted data written to: %s%n", output);
+                }
+            } else {
+                System.out.println(cleanOutput ? formattedOutput : "Formatted Output: \n" + formattedOutput);
+            }
+
+            return 0;
+        } catch (Exception e) {
+            System.err.printf("Error processing data: %s%n", e.getMessage());
+            return 1;
+        }
     }
 
-    @Command(name = "format", description = "Formats raw text data between different formats.")
-    static class FormatCommand implements Callable<Integer> {
-
-        @Option(names = {"-i", "--input"}, description = "Input file or raw data string.", required = true)
-        private String input;
-
-        @Option(names = {"-o", "--output"}, description = "Output file or 'stdout' for console output.", required = true)
-        private String output;
-
-        @Option(names = {"--input-format"}, description = "Input format: JSON, YAML, XML, CSV, PLAIN_TEXT.", required = true)
-        private Formatter.FormatType inputFormat;
-
-        @Option(names = {"--output-format"}, description = "Output format: JSON, YAML, XML, CSV, PLAIN_TEXT, TABLE.", required = true)
-        private Formatter.FormatType outputFormat;
-
-        @Option(names = {"--file"}, description = "Treat input and output as files.")
-        private boolean isFile = false;
+    // Subcommand for examples
+    @Command(name = "examples", description = "Show usage examples for the format tool.")
+    static class ExamplesCommand implements Runnable {
 
         @Override
-        public Integer call() {
-            try {
-                String rawData;
+        public void run() {
+            System.out.println("\n=== Format Tool Usage Examples ===\n");
 
-                // Handle input
-                if (isFile) {
-                    Path inputPath = Path.of(input);
-                    if (!Files.exists(inputPath)) {
-                        throw new IllegalArgumentException(String.format("Input file not found at path: %s", input));
-                    }
-                    rawData = Files.readString(inputPath);
-                    System.out.println("File content loaded successfully.");
-                } else {
-                    rawData = input;
-                }
+            // Formatting examples
+            System.out.println("1. Format a JSON file to YAML:");
+            System.out.println("   $ qbox format -i input.json -o output.yaml -if JSON -of YAML --file");
+            System.out.println();
 
-                // Parse input data
-                String normalizedData = Formatter.normalize(rawData, inputFormat);
+            System.out.println("2. Convert plain text to JSON and output to console:");
+            System.out.println("   $ qbox format -i 'raw text' -o stdout -if PLAIN_TEXT -of JSON");
+            System.out.println();
 
-                // Format output
-                String formattedOutput = Formatter.transform(normalizedData, outputFormat);
+            System.out.println("3. Reformat an XML file to a human-readable table:");
+            System.out.println("   $ qbox format -i input.xml -o output.txt -if XML -of TABLE --file");
+            System.out.println();
 
-                // Handle output
-                if (isFile && !output.equalsIgnoreCase("stdout")) {
-                    Path outputPath = Path.of(output);
-                    Files.writeString(outputPath, formattedOutput);
-                    System.out.printf("Formatted data written to: %s%n", output);
-                } else {
-                    System.out.println(formattedOutput);
-                }
-
-                return 0;
-            } catch (Exception e) {
-                System.err.printf("Error processing data: %s%n", e.getMessage());
-                return 1;
-            }
+            System.out.println("4. Use clean output mode for automation:");
+            System.out.println("   $ qbox format -i input.csv -o stdout -if CSV -of JSON -c");
+            System.out.println();
         }
     }
 }

@@ -122,27 +122,45 @@ function _complete_qbox() {
   if [ "${COMP_LINE}" = "${COMP_WORDS[0]} completion" ];    then _picocli_qbox; return $?; fi
   if [ "${COMP_LINE}" = "${COMP_WORDS[0]} encryption" ];    then _picocli_qbox; return $?; fi
   if [ "${COMP_LINE}" = "${COMP_WORDS[0]} sqlite" ];    then _picocli_qbox; return $?; fi
-  if [ "${COMP_LINE}" = "${COMP_WORDS[0]} formatter" ];    then _picocli_qbox; return $?; fi
+  if [ "${COMP_LINE}" = "${COMP_WORDS[0]} format" ];    then _picocli_qbox; return $?; fi
   if [ "${COMP_LINE}" = "${COMP_WORDS[0]} logger" ];    then _picocli_qbox; return $?; fi
+  if [ "${COMP_LINE}" = "${COMP_WORDS[0]} encryption keygen" ];    then _picocli_qbox_encryption; return $?; fi
+  if [ "${COMP_LINE}" = "${COMP_WORDS[0]} encryption string" ];    then _picocli_qbox_encryption; return $?; fi
+  if [ "${COMP_LINE}" = "${COMP_WORDS[0]} encryption file" ];    then _picocli_qbox_encryption; return $?; fi
+  if [ "${COMP_LINE}" = "${COMP_WORDS[0]} encryption examples" ];    then _picocli_qbox_encryption; return $?; fi
   if [ "${COMP_LINE}" = "${COMP_WORDS[0]} sqlite create-db" ];    then _picocli_qbox_sqlite; return $?; fi
   if [ "${COMP_LINE}" = "${COMP_WORDS[0]} sqlite query" ];    then _picocli_qbox_sqlite; return $?; fi
-  if [ "${COMP_LINE}" = "${COMP_WORDS[0]} formatter format" ];    then _picocli_qbox_formatter; return $?; fi
+  if [ "${COMP_LINE}" = "${COMP_WORDS[0]} sqlite examples" ];    then _picocli_qbox_sqlite; return $?; fi
+  if [ "${COMP_LINE}" = "${COMP_WORDS[0]} format examples" ];    then _picocli_qbox_format; return $?; fi
+  if [ "${COMP_LINE}" = "${COMP_WORDS[0]} logger examples" ];    then _picocli_qbox_logger; return $?; fi
 
   # Find the longest sequence of subcommands and call the bash function for that subcommand.
   local cmds0=(completion)
   local cmds1=(encryption)
   local cmds2=(sqlite)
-  local cmds3=(formatter)
+  local cmds3=(format)
   local cmds4=(logger)
-  local cmds5=(sqlite create-db)
-  local cmds6=(sqlite query)
-  local cmds7=(formatter format)
+  local cmds5=(encryption keygen)
+  local cmds6=(encryption string)
+  local cmds7=(encryption file)
+  local cmds8=(encryption examples)
+  local cmds9=(sqlite create-db)
+  local cmds10=(sqlite query)
+  local cmds11=(sqlite examples)
+  local cmds12=(format examples)
+  local cmds13=(logger examples)
 
-  if CompWordsContainsArray "${cmds7[@]}"; then _picocli_qbox_formatter_format; return $?; fi
-  if CompWordsContainsArray "${cmds6[@]}"; then _picocli_qbox_sqlite_query; return $?; fi
-  if CompWordsContainsArray "${cmds5[@]}"; then _picocli_qbox_sqlite_createdb; return $?; fi
+  if CompWordsContainsArray "${cmds13[@]}"; then _picocli_qbox_logger_examples; return $?; fi
+  if CompWordsContainsArray "${cmds12[@]}"; then _picocli_qbox_format_examples; return $?; fi
+  if CompWordsContainsArray "${cmds11[@]}"; then _picocli_qbox_sqlite_examples; return $?; fi
+  if CompWordsContainsArray "${cmds10[@]}"; then _picocli_qbox_sqlite_query; return $?; fi
+  if CompWordsContainsArray "${cmds9[@]}"; then _picocli_qbox_sqlite_createdb; return $?; fi
+  if CompWordsContainsArray "${cmds8[@]}"; then _picocli_qbox_encryption_examples; return $?; fi
+  if CompWordsContainsArray "${cmds7[@]}"; then _picocli_qbox_encryption_file; return $?; fi
+  if CompWordsContainsArray "${cmds6[@]}"; then _picocli_qbox_encryption_string; return $?; fi
+  if CompWordsContainsArray "${cmds5[@]}"; then _picocli_qbox_encryption_keygen; return $?; fi
   if CompWordsContainsArray "${cmds4[@]}"; then _picocli_qbox_logger; return $?; fi
-  if CompWordsContainsArray "${cmds3[@]}"; then _picocli_qbox_formatter; return $?; fi
+  if CompWordsContainsArray "${cmds3[@]}"; then _picocli_qbox_format; return $?; fi
   if CompWordsContainsArray "${cmds2[@]}"; then _picocli_qbox_sqlite; return $?; fi
   if CompWordsContainsArray "${cmds1[@]}"; then _picocli_qbox_encryption; return $?; fi
   if CompWordsContainsArray "${cmds0[@]}"; then _picocli_qbox_completion; return $?; fi
@@ -156,7 +174,7 @@ function _picocli_qbox() {
   # Get completion data
   local curr_word=${COMP_WORDS[COMP_CWORD]}
 
-  local commands="completion encryption sqlite formatter logger"
+  local commands="completion encryption sqlite format logger"
   local flag_opts="-h --help -V --version"
   local arg_opts=""
 
@@ -189,31 +207,10 @@ function _picocli_qbox_completion() {
 function _picocli_qbox_encryption() {
   # Get completion data
   local curr_word=${COMP_WORDS[COMP_CWORD]}
-  local prev_word=${COMP_WORDS[COMP_CWORD-1]}
 
-  local commands=""
-  local flag_opts="-g --generate-key -f --file -c --clean -h --help -V --version"
-  local arg_opts="-e --encrypt -d --decrypt -k --key -i --input-file -o --output-file"
-
-  type compopt &>/dev/null && compopt +o default
-
-  case ${prev_word} in
-    -e|--encrypt)
-      return
-      ;;
-    -d|--decrypt)
-      return
-      ;;
-    -k|--key)
-      return
-      ;;
-    -i|--input-file)
-      return
-      ;;
-    -o|--output-file)
-      return
-      ;;
-  esac
+  local commands="keygen string file examples"
+  local flag_opts="-h --help -V --version"
+  local arg_opts=""
 
   if [[ "${curr_word}" == -* ]]; then
     COMPREPLY=( $(compgen -W "${flag_opts} ${arg_opts}" -- "${curr_word}") )
@@ -228,7 +225,7 @@ function _picocli_qbox_sqlite() {
   # Get completion data
   local curr_word=${COMP_WORDS[COMP_CWORD]}
 
-  local commands="create-db query"
+  local commands="create-db query examples"
   local flag_opts="-h --help -V --version"
   local arg_opts=""
 
@@ -240,12 +237,12 @@ function _picocli_qbox_sqlite() {
   fi
 }
 
-# Generates completions for the options and subcommands of the `formatter` subcommand.
-function _picocli_qbox_formatter() {
+# Generates completions for the options and subcommands of the `format` subcommand.
+function _picocli_qbox_format() {
   # Get completion data
   local curr_word=${COMP_WORDS[COMP_CWORD]}
 
-  local commands="format"
+  local commands="examples"
   local flag_opts="-h --help -V --version"
   local arg_opts=""
 
@@ -263,7 +260,7 @@ function _picocli_qbox_logger() {
   local curr_word=${COMP_WORDS[COMP_CWORD]}
   local prev_word=${COMP_WORDS[COMP_CWORD-1]}
 
-  local commands=""
+  local commands="examples"
   local flag_opts="-t --timestamp -h --help -V --version"
   local arg_opts="-m --message -l --level -o --output -f --format"
 
@@ -283,6 +280,107 @@ function _picocli_qbox_logger() {
       return
       ;;
   esac
+
+  if [[ "${curr_word}" == -* ]]; then
+    COMPREPLY=( $(compgen -W "${flag_opts} ${arg_opts}" -- "${curr_word}") )
+  else
+    local positionals=""
+    COMPREPLY=( $(compgen -W "${commands} ${positionals}" -- "${curr_word}") )
+  fi
+}
+
+# Generates completions for the options and subcommands of the `keygen` subcommand.
+function _picocli_qbox_encryption_keygen() {
+  # Get completion data
+  local curr_word=${COMP_WORDS[COMP_CWORD]}
+
+  local commands=""
+  local flag_opts="-c --clean"
+  local arg_opts=""
+
+  if [[ "${curr_word}" == -* ]]; then
+    COMPREPLY=( $(compgen -W "${flag_opts} ${arg_opts}" -- "${curr_word}") )
+  else
+    local positionals=""
+    COMPREPLY=( $(compgen -W "${commands} ${positionals}" -- "${curr_word}") )
+  fi
+}
+
+# Generates completions for the options and subcommands of the `string` subcommand.
+function _picocli_qbox_encryption_string() {
+  # Get completion data
+  local curr_word=${COMP_WORDS[COMP_CWORD]}
+  local prev_word=${COMP_WORDS[COMP_CWORD-1]}
+
+  local commands=""
+  local flag_opts="-c --clean"
+  local arg_opts="-e --encrypt -d --decrypt -k --key"
+
+  type compopt &>/dev/null && compopt +o default
+
+  case ${prev_word} in
+    -e|--encrypt)
+      return
+      ;;
+    -d|--decrypt)
+      return
+      ;;
+    -k|--key)
+      return
+      ;;
+  esac
+
+  if [[ "${curr_word}" == -* ]]; then
+    COMPREPLY=( $(compgen -W "${flag_opts} ${arg_opts}" -- "${curr_word}") )
+  else
+    local positionals=""
+    COMPREPLY=( $(compgen -W "${commands} ${positionals}" -- "${curr_word}") )
+  fi
+}
+
+# Generates completions for the options and subcommands of the `file` subcommand.
+function _picocli_qbox_encryption_file() {
+  # Get completion data
+  local curr_word=${COMP_WORDS[COMP_CWORD]}
+  local prev_word=${COMP_WORDS[COMP_CWORD-1]}
+
+  local commands=""
+  local flag_opts="-e --encrypt -d --decrypt --recursive --replace"
+  local arg_opts="-i --input-folder -O --output-folder -k --key --filter"
+
+  type compopt &>/dev/null && compopt +o default
+
+  case ${prev_word} in
+    -i|--input-folder)
+      return
+      ;;
+    -O|--output-folder)
+      return
+      ;;
+    -k|--key)
+      return
+      ;;
+    --filter)
+      return
+      ;;
+  esac
+
+  if [[ "${curr_word}" == -* ]]; then
+    COMPREPLY=( $(compgen -W "${flag_opts} ${arg_opts}" -- "${curr_word}") )
+  else
+    local positionals=""
+    COMPREPLY=( $(compgen -W "${commands} ${positionals}" -- "${curr_word}") )
+  fi
+}
+
+# Generates completions for the options and subcommands of the `examples` subcommand.
+function _picocli_qbox_encryption_examples() {
+  # Get completion data
+  local curr_word=${COMP_WORDS[COMP_CWORD]}
+
+  local commands=""
+  local flag_opts=""
+  local arg_opts=""
 
   if [[ "${curr_word}" == -* ]]; then
     COMPREPLY=( $(compgen -W "${flag_opts} ${arg_opts}" -- "${curr_word}") )
@@ -347,36 +445,48 @@ function _picocli_qbox_sqlite_query() {
   fi
 }
 
-# Generates completions for the options and subcommands of the `format` subcommand.
-function _picocli_qbox_formatter_format() {
+# Generates completions for the options and subcommands of the `examples` subcommand.
+function _picocli_qbox_sqlite_examples() {
   # Get completion data
   local curr_word=${COMP_WORDS[COMP_CWORD]}
-  local prev_word=${COMP_WORDS[COMP_CWORD-1]}
 
   local commands=""
-  local flag_opts="--file"
-  local arg_opts="-i --input -o --output --input-format --output-format"
-  local inputFormat_option_args="JSON YAML XML CSV PLAIN_TEXT TABLE" # --input-format values
-  local outputFormat_option_args="JSON YAML XML CSV PLAIN_TEXT TABLE" # --output-format values
+  local flag_opts=""
+  local arg_opts=""
 
-  type compopt &>/dev/null && compopt +o default
+  if [[ "${curr_word}" == -* ]]; then
+    COMPREPLY=( $(compgen -W "${flag_opts} ${arg_opts}" -- "${curr_word}") )
+  else
+    local positionals=""
+    COMPREPLY=( $(compgen -W "${commands} ${positionals}" -- "${curr_word}") )
+  fi
+}
 
-  case ${prev_word} in
-    -i|--input)
-      return
-      ;;
-    -o|--output)
-      return
-      ;;
-    --input-format)
-      COMPREPLY=( $( compgen -W "${inputFormat_option_args}" -- "${curr_word}" ) )
-      return $?
-      ;;
-    --output-format)
-      COMPREPLY=( $( compgen -W "${outputFormat_option_args}" -- "${curr_word}" ) )
-      return $?
-      ;;
-  esac
+# Generates completions for the options and subcommands of the `examples` subcommand.
+function _picocli_qbox_format_examples() {
+  # Get completion data
+  local curr_word=${COMP_WORDS[COMP_CWORD]}
+
+  local commands=""
+  local flag_opts=""
+  local arg_opts=""
+
+  if [[ "${curr_word}" == -* ]]; then
+    COMPREPLY=( $(compgen -W "${flag_opts} ${arg_opts}" -- "${curr_word}") )
+  else
+    local positionals=""
+    COMPREPLY=( $(compgen -W "${commands} ${positionals}" -- "${curr_word}") )
+  fi
+}
+
+# Generates completions for the options and subcommands of the `examples` subcommand.
+function _picocli_qbox_logger_examples() {
+  # Get completion data
+  local curr_word=${COMP_WORDS[COMP_CWORD]}
+
+  local commands=""
+  local flag_opts=""
+  local arg_opts=""
 
   if [[ "${curr_word}" == -* ]]; then
     COMPREPLY=( $(compgen -W "${flag_opts} ${arg_opts}" -- "${curr_word}") )
